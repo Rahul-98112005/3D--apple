@@ -4,6 +4,8 @@ import { useState } from "react";
 import gsap from "gsap";
 import { pauseImg, playImg, replayImg } from "../utils";
 import { useGSAP } from "@gsap/react";
+import ScrollTrigger from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
 
 const VideoCarousel = () => {
   const videoRef = useRef<(HTMLVideoElement | null)[]>([]);
@@ -12,11 +14,11 @@ const VideoCarousel = () => {
   const [loadedData, setloadedData] = useState<number[]>([]);
 
   const [video, setvideo] = useState({
-    isEnd: false,
-    startPlay: false,
+    isEnd: false, // current video ended
+    startPlay: false, // tracks video started palying
     videoId: 0,
-    isLastVideo: false,
-    isPlaying: false,
+    isLastVideo: false,  // tracks it is the last video
+    isPlaying: false,  // tracks if th evideo is actively palying
   });
   const { isEnd, startPlay, videoId, isLastVideo, isPlaying } = video;
 
@@ -28,10 +30,10 @@ const VideoCarousel = () => {
     })
 
 
-    gsap.to("#video", {
+    gsap.to('#video', {
       scrollTrigger: {
-        trigger: "#video",
-        toggleActions: "restart none none none",
+        trigger: '#video',
+        toggleActions: 'restart none none none',
       },
       onComplete: () => {
         setvideo((pre) => ({
@@ -114,7 +116,7 @@ const VideoCarousel = () => {
     }
   }, [videoId, startPlay]);
 
-  const handleProcess = (type, i) => {
+  const handleProcess = (type: any, i: any) => {
     switch (type) {
       case "video-end":
         setvideo((pre) => ({
@@ -178,7 +180,7 @@ const VideoCarousel = () => {
                   onEnded={() => {
                     i !== 3
                       ? handleProcess("video-end", i)
-                      : handleProcess("video-last");
+                      : handleProcess("video-last", 0);
                   }}
                   onPlay={() => {
                     setvideo((prevVideo) => ({
@@ -191,7 +193,7 @@ const VideoCarousel = () => {
                   <source src={list.video} type="video/mp4" />
                 </video>
               </div>
-              <div className="absolute top-12 left-[%5] z-10">
+              <div className="absolute top-12 left-[5%] z-10">
                 {list.textLists.map((text) => (
                   <p
                     key={text}
@@ -226,12 +228,12 @@ const VideoCarousel = () => {
             alt={isLastVideo ? "replay" : !isPlaying ? "play" : "pause"}
             onClick={
               isLastVideo
-                ? () => handleProcess("video-reset")
+                ? () => handleProcess("video-reset" , 0)
                 : !isPlaying
-                ? () => handleProcess("play")
-                : () => handleProcess("pause")
+                ? () => handleProcess("play", "")
+                : () => handleProcess("pause" , "")
             }
-          />
+          />                            
         </button>
       </div>
     </>
